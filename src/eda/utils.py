@@ -1,6 +1,6 @@
 import pandas as pd
 
-def get_child_categories_count_by_parent_categories(data):
+def get_child_categories_count_by_parent_categories(data, k=15):
     parent_categories = list(set([x[0] for x in data['category']]))
 
     parent_categories_with_child_categories_count = dict({ x: [] for x in parent_categories })
@@ -17,4 +17,4 @@ def get_child_categories_count_by_parent_categories(data):
 
     parent_categories_with_counts_df['count'] = parent_categories_with_counts_df['count'].apply(lambda x: len(set(x)))
 
-    return parent_categories_with_counts_df
+    return parent_categories_with_counts_df[:k]
