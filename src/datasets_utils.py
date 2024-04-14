@@ -13,7 +13,6 @@ def get_luxury_data(with_prints=False):
     data = data.dropna()
     data['categories_count'] = data['category'].str.len()
     data = data[data['categories_count'] != 1]
-    # data = data[(data['description'].str.split().str.len() > 10) & (data['description'].str.split().str.len() <= 130)]
     data = data.reset_index()
     data = data.drop(['index'], axis=1)
     return data[['description', 'category']]
@@ -38,7 +37,6 @@ def get_tech_data(with_prints=False):
     data = data.dropna()
     data['categories_count'] = data['category'].str.len()
     data = data[data['categories_count'] != 1]
-    # data = data[(data['description'].str.split().str.len() > 10) & (data['description'].str.split().str.len() <= 300)]
     data = data.reset_index()
     data = data.drop(['index'], axis=1)
     return data[['description', 'category']]
@@ -54,7 +52,6 @@ def get_retail_data():
     data = data.dropna()
     data['categories_count'] = data['category'].str.len()
     data = data[data['categories_count'] != 1]
-    # data = data[(data['description'].str.split().str.len() > 10) & (data['description'].str.split().str.len() <= 300)]
     data = data.reset_index()
     data = data.drop(['index'], axis=1)
     return data[['description', 'category']]
@@ -70,7 +67,6 @@ def get_big_basket_data():
     data = data.dropna()
     data['categories_count'] = data['category'].str.len()
     data = data[data['categories_count'] != 1]
-    # data = data[(data['description'].str.split().str.len() > 10) & (data['description'].str.split().str.len() <= 300)]
     data = data.reset_index()
     data = data.drop(['index'], axis=1)
     return data[['description', 'category']]

@@ -11,3 +11,5 @@ catboost_info
 datasets
 __pycache__
 *.bin
+big_basket_pt
+big_basket*.pt
