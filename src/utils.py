@@ -9,7 +9,19 @@ from sklearn.metrics import (
 import gensim.downloader as api
 
 
-def get_accuracy(outputs, targets):
+def accuracy_ml_score(y_true, y_pred):
+    total_obs, n_classes = y_true.shape
+    correct_preds = np.sum(y_pred.T == y_true.T, axis=1)
+    correct_preds = correct_preds / total_obs
+    return np.sum(correct_preds) / n_classes
+
+
+def get_accuracy(outputs, targets, full_results=False):
+    if full_results:
+        result = 0
+        outputs
+        return result
+
     correct_predictions = np.sum(outputs == targets)
     num_samples = targets.size
     return float(correct_predictions) / num_samples
@@ -38,7 +50,8 @@ def w2v_vectorize(data):
 
 
 def display_metrics(y_true, y_pred):
-    print(f"Accuracy: {accuracy_score(y_true, y_pred)}")
+    print(f"Accuracy (subset): {accuracy_score(y_true, y_pred)}")
+    print(f"Accuracy (ML): {accuracy_ml_score(y_true, y_pred)}")
     print(f"Precision (macro): {precision_score(y_true, y_pred, average='macro')}")
     print(f"Precision (micro): {precision_score(y_true, y_pred, average='micro')}")
     print(f"Recall (macro): {recall_score(y_true, y_pred, average='macro')}")

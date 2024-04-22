@@ -3,20 +3,20 @@ from sklearn.metrics import (
     accuracy_score,
     hamming_loss,
 )
-from utils import get_accuracy
+from utils import get_accuracy, accuracy_ml_score
 
 
 def bert_train(model, train_loader, optimizer, loss_fn, epochs, device="cpu"):
     model.train()
 
     losses = []
-    accuracy = []
+    accuracy_adapted = []
     accuracy_subset = []
     hl = []
 
     for epoch in range(epochs):
         epoch_losses = []
-        epoch_accuracy = []
+        epoch_accuracy_adapted = []
         epoch_accuracy_subset = []
         epoch_hl = []
 
@@ -37,7 +37,7 @@ def bert_train(model, train_loader, optimizer, loss_fn, epochs, device="cpu"):
             outputs = torch.sigmoid(outputs).cpu().detach().numpy().round()
             targets = targets.cpu().detach().numpy()
 
-            epoch_accuracy.append(get_accuracy(outputs, targets))
+            epoch_accuracy_adapted.append(accuracy_ml_score(targets, outputs))
             epoch_accuracy_subset.append(accuracy_score(targets, outputs))
             epoch_hl.append(hamming_loss(targets, outputs))
 
@@ -51,13 +51,13 @@ def bert_train(model, train_loader, optimizer, loss_fn, epochs, device="cpu"):
             optimizer.step()
 
         losses.append(epoch_losses)
-        accuracy.append(epoch_accuracy)
+        accuracy_adapted.append(epoch_accuracy_adapted)
         accuracy_subset.append(epoch_accuracy_subset)
         hl.append(epoch_hl)
 
     return {
         "loss": losses,
-        "accuracy": accuracy,
+        "accuracy": accuracy_adapted,
         "accuracy_subset": accuracy_subset,
         "hl": hl,
     }
