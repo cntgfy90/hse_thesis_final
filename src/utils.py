@@ -7,6 +7,7 @@ from sklearn.metrics import (
     hamming_loss,
 )
 import gensim.downloader as api
+from sklearn.model_selection import train_test_split
 
 
 def accuracy_ml_score(y_true, y_pred):
@@ -57,3 +58,27 @@ def display_metrics(y_true, y_pred):
     print(f"Recall (macro): {recall_score(y_true, y_pred, average='macro')}")
     print(f"Recall (micro): {recall_score(y_true, y_pred, average='micro')}")
     print(f"Hamming loss: {hamming_loss(y_true, y_pred)}")
+
+def get_splitted_dataset(data):
+    categories = [column for column in data.columns if column != 'description']
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        data['description'],
+        data[categories],
+        test_size=0.2,
+        random_state=13
+    )
+
+    X_train = X_train.reset_index()
+    X_train = X_train.drop(['index'], axis=1)
+
+    X_test = X_test.reset_index()
+    X_test = X_test.drop(['index'], axis=1)
+
+    y_train = y_train.reset_index()
+    y_train = y_train.drop(['index'], axis=1)
+
+    y_test = y_test.reset_index()
+    y_test = y_test.drop(['index'], axis=1)
+
+    return X_train, X_test, y_train, y_test

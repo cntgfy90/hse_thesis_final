@@ -6,17 +6,18 @@ from sklearn.metrics import (
     recall_score,
     hamming_loss,
 )
-from utils import get_accuracy
 
 
-def bert_test(model, validation_loader, loss_fn, device="cpu"):
+def bert_test(model, validation_loader, loss_fn, num_classes, device="cpu"):
+    total_obs = 0
+    correct_predictions = np.zeros((num_classes))
+
     losses = []
     hl = []
     macro_precision = []
     micro_precision = []
     macro_recall = []
     micro_recall = []
-    accuracy = []
     accuracy_subset = []
 
     # set model to eval mode (turn off dropout, fix batch norm)
@@ -38,23 +39,36 @@ def bert_test(model, validation_loader, loss_fn, device="cpu"):
             outputs = torch.sigmoid(outputs).cpu().detach().numpy().round()
             targets = targets.cpu().detach().numpy()
 
+            total_obs += outputs.shape[0]
+            correct_predictions += np.sum(outputs.T == targets.T, axis=1)
+
             # Hamming loss
             hl.append(hamming_loss(targets, outputs))
 
-            accuracy.append(get_accuracy(outputs, targets))
             accuracy_subset.append(accuracy_score(targets, outputs))
 
             # Macro / mictor precision
-            macro_precision.append(precision_score(targets, outputs, average="macro", zero_division=1))
-            micro_precision.append(precision_score(targets, outputs, average="micro", zero_division=1))
+            macro_precision.append(
+                precision_score(targets, outputs, average="macro", zero_division=1)
+            )
+            micro_precision.append(
+                precision_score(targets, outputs, average="micro", zero_division=1)
+            )
 
             # Macro / mictor recall
-            macro_recall.append(recall_score(targets, outputs, average="macro", zero_division=1))
-            micro_recall.append(recall_score(targets, outputs, average="micro", zero_division=1))
+            macro_recall.append(
+                recall_score(targets, outputs, average="macro", zero_division=1)
+            )
+            micro_recall.append(
+                recall_score(targets, outputs, average="micro", zero_division=1)
+            )
+
+    adapated_accuracy_score = np.sum(correct_predictions / total_obs) / num_classes
 
     return {
-        "accuracy": accuracy,
+        "accuracy_adapated": adapated_accuracy_score,
         "accuracy_subset": accuracy_subset,
+        "correct_predictions": correct_predictions,
         "loss": losses,
         "hamming_loss": hl,
         "macro_precision": macro_precision,

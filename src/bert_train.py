@@ -3,20 +3,25 @@ from sklearn.metrics import (
     accuracy_score,
     hamming_loss,
 )
-from utils import get_accuracy, accuracy_ml_score
+import numpy as np
 
 
-def bert_train(model, train_loader, optimizer, loss_fn, epochs, device="cpu"):
+def bert_train(
+    model, train_loader, optimizer, loss_fn, epochs, num_classes, device="cpu"
+):
     model.train()
 
     losses = []
+    correct_predictions = []
     accuracy_adapted = []
     accuracy_subset = []
     hl = []
 
     for epoch in range(epochs):
+        total_obs = 0
+        epoch_correct_predictions = np.zeros((num_classes))
+
         epoch_losses = []
-        epoch_accuracy_adapted = []
         epoch_accuracy_subset = []
         epoch_hl = []
 
@@ -37,7 +42,9 @@ def bert_train(model, train_loader, optimizer, loss_fn, epochs, device="cpu"):
             outputs = torch.sigmoid(outputs).cpu().detach().numpy().round()
             targets = targets.cpu().detach().numpy()
 
-            epoch_accuracy_adapted.append(accuracy_ml_score(targets, outputs))
+            total_obs += outputs.shape[0]
+            epoch_correct_predictions += np.sum(outputs.T == targets.T, axis=1)
+
             epoch_accuracy_subset.append(accuracy_score(targets, outputs))
             epoch_hl.append(hamming_loss(targets, outputs))
 
@@ -51,13 +58,16 @@ def bert_train(model, train_loader, optimizer, loss_fn, epochs, device="cpu"):
             optimizer.step()
 
         losses.append(epoch_losses)
-        accuracy_adapted.append(epoch_accuracy_adapted)
+        correct_predictions.append(epoch_correct_predictions)
+        adapated_accuracy_score = np.sum(epoch_correct_predictions / total_obs) / num_classes
+        accuracy_adapted.append(adapated_accuracy_score)
         accuracy_subset.append(epoch_accuracy_subset)
         hl.append(epoch_hl)
 
     return {
         "loss": losses,
-        "accuracy": accuracy_adapted,
+        "correct_predictions": correct_predictions,
+        "accuracy_adapted": accuracy_adapted,
         "accuracy_subset": accuracy_subset,
         "hl": hl,
     }
